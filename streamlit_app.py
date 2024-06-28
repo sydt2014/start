@@ -1,7 +1,5 @@
 import streamlit as st
 import pandas as pd
-from PIL import Image
-import graphviz as graphviz
 
 st.title("我的第一个 Streamlit 应用")
 st.write('Hello, world!')
@@ -19,31 +17,6 @@ with tab2:
 with tab3:
     st.header("一只猫头鹰")
     st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
-
-graph = graphviz.Digraph()
-graph.edge('run', 'intr')
-graph.edge('intr', 'runbl')
-graph.edge('runbl', 'run')
-graph.edge('run', 'kernel')
-graph.edge('kernel', 'zombie')
-graph.edge('kernel', 'sleep')
-graph.edge('kernel', 'runmem')
-graph.edge('sleep', 'swap')
-graph.edge('swap', 'runswap')
-graph.edge('runswap', 'new')
-graph.edge('runswap', 'runmem')
-graph.edge('new', 'runmem')
-graph.edge('sleep', 'runmem')
-
-st.graphviz_chart(graph)
-
-image_file = st.file_uploader('图片文件', type=['png'])
-if image_file is None:
-    st.stop()
-
-image = Image.open(image_file)
-st.image(image, caption='Sunset', use_column_width=True)
-
 
 @st.cache_data
 def load_file(file):
