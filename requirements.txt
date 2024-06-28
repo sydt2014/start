@@ -1,6 +1,4 @@
 altair
-PIL
-graphviz
 pandas
 streamlit
 
