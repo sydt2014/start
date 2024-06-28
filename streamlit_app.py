@@ -1,40 +1,79 @@
-import altair as alt
-import numpy as np
-import pandas as pd
 import streamlit as st
+import pandas as pd
+from PIL import Image
+import graphviz as graphviz
 
-"""
-# Welcome to Streamlit!
+st.title("我的第一个 Streamlit 应用")
+st.write('Hello, world!')
+st.markdown('**This** is some Markdown *text*.')
+tab1, tab2, tab3 = st.tabs(["猫", "狗", "猫头鹰"])
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+with tab1:
+    st.header("一只猫")
+    st.image("https://static.streamlit.io/examples/cat.jpg", width=200)
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+with tab2:
+    st.header("一只狗")
+    st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
+with tab3:
+    st.header("一只猫头鹰")
+    st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
+graph = graphviz.Digraph()
+graph.edge('run', 'intr')
+graph.edge('intr', 'runbl')
+graph.edge('runbl', 'run')
+graph.edge('run', 'kernel')
+graph.edge('kernel', 'zombie')
+graph.edge('kernel', 'sleep')
+graph.edge('kernel', 'runmem')
+graph.edge('sleep', 'swap')
+graph.edge('swap', 'runswap')
+graph.edge('runswap', 'new')
+graph.edge('runswap', 'runmem')
+graph.edge('new', 'runmem')
+graph.edge('sleep', 'runmem')
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
+st.graphviz_chart(graph)
 
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
+image_file = st.file_uploader('图片文件', type=['png'])
+if image_file is None:
+    st.stop()
 
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+image = Image.open(image_file)
+st.image(image, caption='Sunset', use_column_width=True)
+
+
+@st.cache_data
+def load_file(file):
+    print("load file")
+    return pd.read_excel(file, None)
+upload_file = st.file_uploader('excel文件', type=['xlsx'])
+if upload_file is None:
+    st.stop()
+dfs = load_file(upload_file)
+# st.dataframe(dfs)
+names = list(dfs.keys())
+sheet_selects = st.multiselect('工作表', names, [])
+if len(sheet_selects) == 0:
+    st.stop()
+
+tabs = st.tabs(sheet_selects)
+for tab, name in zip(tabs, sheet_selects):
+    with tab:
+        df = dfs[name]
+        st.dataframe(df)
+
+# 添加文本
+st.text("欢迎使用 Streamlit！")
+
+# 添加一个输入框
+name = st.text_input("请输入您的姓名", "匿名")
+
+# 添加一个按钮
+button = st.button("提交")
+
+# 在按钮被点击时执行的操作
+if button:
+    st.text("你好，" + name + "！欢迎使用 Streamlit！")
